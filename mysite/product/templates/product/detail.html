@@ -1,10 +1,78 @@
-<h1>{{ poll.question }}</h1>
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-<form action="{% url 'polls:vote' poll.id %}" method="post">
-{% csrf_token %}
-{% for choice in poll.choice_set.all %}
-    <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
-    <label for="choice{{ forloop.counter }}">{{ choice.choice }}</label><br />
-{% endfor %}
-<input type="submit" value="Vote" />
-</form> 
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.comment {
+    border: 2px solid gray;
+    padding:5px;
+}
+#header {
+    background-color:black;
+    color:white;
+    text-align:center;
+    padding:5px;
+}
+.nav {
+    line-height:30px;
+    background-color:#eeeeee;
+    height:300px;
+    width:200px;
+    float:left;
+    padding:5px;	      
+}
+.detail {
+    float:left;
+    padding:10px;	 	 
+}
+#footer {
+    background-color:black;
+    color:white;
+    clear:both;
+    text-align:center;
+   padding:5px;	 	 
+}
+</style>
+</head>
+<body>
+
+<div id="header">
+<h1>Products</h1>
+</div>
+<div class="nav">
+{% if product_list %}
+    {% for p in product_list %}
+            <a href="{% url 'product:detail' p.id %}">{{ p.name }}</a><br>
+    {% endfor %}
+{% else %}
+    <p>No Products</p>
+{% endif %}
+</div>
+<div class="detail">
+<h2>{{product.name}}</h2>
+        <p>{{product.description}}</p>
+        <p><small>Product added: {{product.created_at}}</small></p>
+        <hr>
+        <p>Comments:</p>
+        <ul>{% for comment in product.post_set.all reversed %}
+                <div class="comment">
+                    <div class="time"><small> Comment: <b>{{ comment.author}}</b> | {{ comment.created }}</small></div><hr>
+                    <div class="body"><i>{{ comment.body|linebreaks }}</i></div>
+                </div>
+                <br>
+            {% endfor %}
+            </ul>
+        <div id="addc">Add a comment</div>
+        <form action="{% url 'product:add_comment' product.id %}" method="POST">{% csrf_token %}
+            <div id="cform">
+            <p><input type="text" name="body" value="{{ form.body}}" height="300px"></p>
+            </div>
+        <div id="submit"><input type="submit" value="Submit"></div>
+        </form>
+</div>
+
+<div id="footer">
+Copyright © Krop
+</div>
+
+</body>
+</html>
