@@ -23,3 +23,8 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
+class Vote(models.Model):
+    product = models.ForeignKey(Product,default=1)
+    author = models.ForeignKey(User,default=1)
+    rate = models.BooleanField('Liked')
+    
