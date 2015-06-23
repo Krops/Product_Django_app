@@ -63,7 +63,7 @@
 <div class="nav">
 {% if product_list %}
     {% for p in product_list %}
-            <a href="{% url 'product:detail' p.id %}">{{ p.name }}</a><br>
+            <a href="{% url 'product:detail' p.slug %}">{{ p.name }}</a><br>
     {% endfor %}
 {% else %}
     <p>No Products</p>
@@ -71,9 +71,10 @@
 </div>
 <div class="detail">
         <h1>{{product.name}}</h1>
+        <h2>{{ product.price }}$</h2>
         <p>{{product.description}}</p>
         <p><small>Product added: {{product.created_at}}</small> 
-        <form action="{% url 'product:vote' product.id %}" method="POST">
+        <form action="{% url 'product:vote' product.slug %}" method="POST">
         {% csrf_token %}
         <input type="submit" value="Vote" name="vote">
         <label for="vote">{{product.rate}}</label><br>
@@ -90,7 +91,7 @@
             {% endfor %}
             </ul>
         <div id="addc">Add a comment</div>
-        <form action="{% url 'product:add_comment' product.id %}" method="POST">{% csrf_token %}
+        <form action="{% url 'product:add_comment' product.slug %}" method="POST">{% csrf_token %}
             <div id="cform">
             <!--<p><textarea name="body" value="{{ form.body}}" height="300"></p>-->
             <textarea rows="5" cols="45" name="body"></textarea>

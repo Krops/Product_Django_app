@@ -20,5 +20,5 @@ from django.contrib.auth import views
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^login/', 'django.contrib.auth.views.login'),
-    url(r'^list/', include('product.urls',namespace='product')),
+    url(r'^products/', include('product.urls',namespace='product')),
 ]

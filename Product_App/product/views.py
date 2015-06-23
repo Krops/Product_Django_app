@@ -2,6 +2,8 @@ from django.shortcuts import get_object_or_404, render
 from .models import Product, Post, Vote
 from django.views import generic
 from django import forms
+from django.db import connection
+import sys
 
 # Create your views here.
 from django.contrib.auth import authenticate, login
@@ -33,51 +35,69 @@ def my_view(request):
         else:
             raise forms.ValidationError("Sorry, that login was invalid. Please try again.")
             # Return a 'disabled account' error message
-            ...
     else:
         raise forms.ValidationError("Sorry, that login was invalid. Please try again.")
         # Return an 'invalid login' error message.
+
 class IndexView(generic.ListView):
     template_name = 'product/list.html'
     context_object_name = 'product_list'
 
+
     def get_queryset(self):
         """Return the last five published questions."""
         return Product.objects.order_by('created_at')
-'''def authorized(request):
-    if request.user.is_authenticated():
-        nope'''
-def detail(request,product_id):
+def products(request):
+    product_list = Product.objects.order_by('created_at')
+    sort = request.GET.get('sort')
+    #products = Product.objects.all()
+    print('hello')
+    if sort is not None:
+        product_list = product_list.order_by(sort)
+
+        if headers[sort] == "des":
+            product_list.reverse()
+            headers[sort] = "asc"
+        else:
+            headers[sort] = "des"
+    return render(request, 'product/list.html', {'product_list':product_list})
+
+def detail(request,slug):
     product_list = Product.objects.order_by('created_at')[:5]
-    product = get_object_or_404(Product, pk=product_id)
+    #p = Product.objects.filter(slug=product_id)[0]
+    #print(Product.objects.filter(slug=product_id)[0].id)
+    #print(Product.objects.filter(slug=product_id).id)
+    product = get_object_or_404(Product,slug=slug)
     context = {'product_list':product_list,'product':product}
     context.update(csrf(request))
     return render(request, 'product/detail.html', context)
-def add_comment(request, product_id):
-    #product = get_object_or_404(Product, pk=product_id)
+
+def add_comment(request, slug):
+    product_id = Product.objects.get(slug=slug).pk
     comment = Post(title="goog",body=request.POST['body'],product_id=product_id,author_id=request.user.id)
-    #author = post["author"]
     comment.save()
-    return HttpResponseRedirect(reverse('product:detail', args=(product_id,)))
-def vote(request, product_id):
-    p = get_object_or_404(Product, pk=product_id)
+    return HttpResponseRedirect(reverse('product:detail', args=(slug,)))
+
+def vote(request, slug):
+    p = get_object_or_404(Product, slug=slug)
+    product_id= Product.objects.get(slug=slug).pk
     try:
         if request.user.is_authenticated():
-            print('hello')
-            #print(Vote.objects.raw('SELECT id FROM product_vote WHERE product_id=1 and author_id=1 and rate=True')[0].id)
-            try:
-                if Vote.objects.raw('SELECT id FROM product_vote WHERE product_id=%s and author_id=%s and rate=True',product_id,request.user.id) > 0:
-                    Vote.objects.raw('UPDATE product_vote SET rate=False WHERE product_id= %s and author_id= %s',product_id,request.user.id)
-                #p.choice_set.get(pk=request.POST['choice'])
-                    p.rate -= 1
-                    p.save()
-            except:
-                #if Vote.objects.raw('SELECT id FROM product_vote WHERE product_id=1 and author_id=1 and rate=False')[0].id>0:
-                print(product_id,request.user.id)
-                voted = Vote(rate=True,product_id=product_id,author_id=request.user.id)
+            if Vote.objects.filter(rate=True, author_id=request.user.id,product_id=product_id).count() >0:
+                vote_update(False,product_id,request.user.id)
+                p.rate -= 1
+                p.save()
+
+            elif Vote.objects.filter(rate=False, author_id=request.user.id,product_id=product_id).count() >0:
+                vote_update(True,product_id,request.user.id)
+                p.rate += 1
+                p.save()
+            elif Vote.objects.filter(author_id=request.user.id,product_id=product_id).count()==0:
+                voted = Vote(rate=True,slug=slug,author_id=request.user.id)
                 voted.save()
                 p.rate += 1
                 p.save()
+
         else:
             return HttpResponseRedirect(reverse('django.contrib.auth.views.login'))
         
@@ -85,8 +105,32 @@ def vote(request, product_id):
         # Redisplay the question voting form.
         return render(request, 'product/detail.html', {
             'product': p,
-            'error_message': "You didn't select a choice.",
+            'error_message': "Pleasure login.",
         })
 
 
-    return HttpResponseRedirect(reverse('product:detail', args=(p.id,)))
+
+
+    return HttpResponseRedirect(reverse('product:detail', args=(p.slug,)))
+
+def vote_update(rate,product_id,author_id):
+    cursor = connection.cursor()
+    cursor.execute('UPDATE product_vote SET rate=%s WHERE product_id= %s and author_id= %s',[rate,product_id,author_id])
+
+headers = {'name':'asc',
+         'price':'asc',
+         'rate':'asc',}
+def table_view(request):
+    sort = request.GET.get('sort')
+    products = Product.objects.all()
+    print('hello')
+    if sort is not None:
+        products = products.order_by(sort)
+
+        if headers[sort] == "des":
+            products.reverse()
+            headers[sort] = "asc"
+        else:
+            headers[sort] = "des"
+
+    return HttpResponseRedirect(reverse('product',{'product_list':products}))

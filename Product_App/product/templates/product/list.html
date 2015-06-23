@@ -14,12 +14,8 @@
     float:left;	      
 }
 .nav {
-    line-height:30px;
-    background-color:#eeeeee;
-    height:300px;
-    width:200px;
-    float:left;
-    padding:5px;	      
+    padding:10px;
+    width:700px;
 }
 .header {
     background-color:black;
@@ -55,9 +51,23 @@
 </div>
 <div class="nav">
 {% if product_list %}
+    <table align="center">
+    <tr>
+            <td><a href="?sort=name">Name</a></td>
+            <td>Description</td>
+            <td><a href="?sort=price">Price</a></td>
+            <td><a href="?sort=rate">Likes</a></td>
+    </tr>
     {% for p in product_list %}
-            <a href="{% url 'product:detail' p.id %}">{{ p.name }}</a><br>
+
+        <tr>
+            <td><a href="{% url 'product:detail' p.slug %}">{{ p.name }}</a></td>
+            <td>{{p.description}}</td>
+            <td>{{ p.price }}$</td>
+            <td>{{ p.rate }}</td>
+        </tr>
     {% endfor %}
+    </table>
 {% else %}
     <p>No Products</p>
 {% endif %}
