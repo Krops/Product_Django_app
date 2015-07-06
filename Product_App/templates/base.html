@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load staticfiles %}
+    <link href="{% static "css/style.css" %}" rel="stylesheet" media="screen"/>
+    <link href="{% static "css/jquery.dataTables.css" %}" rel="stylesheet" media="screen"/>
+    <script type="text/javascript" src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/jquery.dataTables.min.js" %}"></script>
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+<div class="page-wrapper">
+    <div class="log">
+        {% if user.username %}
+            <form action="{% url 'product:logout_view' %}" method="POST">
+                {% csrf_token %}
+                <input type="submit" value="Logout" name="logout">
+                <label for="logout" text-align='left' float='left'>
+                    <small>Login as: {{ user.username }}</small>
+                </label><br>
+            </form></p>
+        {% else %}
+            <form action="{% url 'django.contrib.auth.views.login' %}" method="POST">
+                {% csrf_token %}
+                <input type="submit" value="Login" name="login">
+                <label for="login" text-align='left' float='left'>
+                    <small>Login as: Anon</small>
+                </label><br>
+            </form></p>
+        {% endif %}
+    </div>
+    <div class="header">
+        <h1>Products</h1>
+    </div>
+    {% block content %}{% endblock %}
+    <div class="page-buffer"></div>
+</div>
+<div class="footer">
+    Copyright © Krop
+</div>
+</body>
+</html>

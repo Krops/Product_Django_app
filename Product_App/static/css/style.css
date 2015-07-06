@@ -1,0 +1,63 @@
+.nav {
+    line-height: 30px;
+    background-color: #eeeeee;
+    height: 300px;
+    width: 200px;
+    float: left;
+    padding: 5px;
+}
+
+.detail {
+    float: left;
+    padding: 10px;
+    width: 700px;
+}
+.comment {
+    border: 2px solid gray;
+    padding: 5px;
+}
+
+.log {
+
+    background-color: black;
+    color: white;
+    width: 200px;
+    float: left;
+}
+
+.header {
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 5px;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.page-wrapper {
+    min-height: 100%;
+    margin-bottom: -50px;
+}
+
+* html .page-wrapper {
+    height: 100%;
+}
+
+.page-buffer {
+    height: 50px;
+}
+
+.footer {
+    background-color: black;
+    color: white;
+    text-align: center;
+    position: relative; /* negative value of footer height */
+    clear: both;
+}
+table {
+    float: right;
+}

@@ -1,8 +1,13 @@
 from django.contrib import admin
-from .models import Product,Post,Vote
-# Register your models here.
 from .models import Product
+# Register your models here.]
 class PostAdmin(admin.ModelAdmin):
-    search_fields = ["title"]
+    fieldsets = [
+        (None,               {'fields': ['name']}),
+        ('Date information', {'fields': ['created_at'], 'classes': ['collapse']}),
+    ]
+    list_display = ('name', 'created_at','was_published_recently')
+    list_filter = ['created_at']
+    search_fields = ["name"]
 
-admin.site.register(Vote, PostAdmin)
+admin.site.register(Product, PostAdmin)

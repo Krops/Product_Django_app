@@ -1,99 +1,41 @@
-<!DOCTYPE html>
-<html>
-<head>
-<style>
-.comment {
-    border: 2px solid gray;
-    padding:5px;
-}
-.log {
+{% extends "base.html" %}
+{% block content %}
+    <div class="detail">
+        {% if product_list %}
+            <table id="example" class="display" width="100%" cellspacing="0" align="right">
+                <thead>
+                <tr>
+                    <td>Name</td>
+                    <td>Description</td>
+                    <td>Price</td>
+                    <td>Likes</td>
+                </tr>
+                </thead>
+                <tfoot>
+                <td>Name</td>
+                <td>Description</td>
+                <td>Price</td>
+                <td>Likes</td>
+                </tfoot>
+                <tbody>
+                {% for p in product_list %}
 
-    background-color:black;
-    color:white;
-    width:200px;
-    float:left;	      
-}
-.nav {
-    padding:10px;
-    width:700px;
-}
-.header {
-    background-color:black;
-    color:white;
-    text-align:center;
-    padding:5px;
-}
-* { margin:0; padding:0; }
-html, body, #wrap { height: 100%; }
-body > #wrap {height: auto; min-height: 100%;}
-#main { padding-bottom: 150px; }
-#footer {
-    background-color:black;
-    color:white;
-    text-align:center;
-    position: relative;
-    margin-top: -300px; /* negative value of footer height */
-    height: 150px;
-    clear:both;
-}
-    .clearfix:after {content: ".";
-    display: block;
-    height: 0;
-    clear: both;
-    visibility: hidden;}
-.clearfix {display: inline-block;}
-/* Hides from IE-mac \*/
-* html .clearfix { height: 1%;}
-.clearfix {display: block;}
-</style>
-<body>
-<div class="log">
-{% if user.username %}
-<form action="{% url 'product:logout_view' %}" method="POST">
-        {% csrf_token %}
-        <input type="submit" value="Logout" name="logout">
-        <label for="logout" text-align='left' float='left'><small>Login as: {{user.username}}</small></label><br>
-</form></p>
-{% else %}
-<form action="{% url 'django.contrib.auth.views.login' %}" method="POST">
-        {% csrf_token %}
-        <input type="submit" value="Login" name="login">
-        <label for="login" text-align='left' float='left'><small>Login as: Anon</small></label><br>
-</form></p>
-{% endif %} 
-</div>
-<div class="header">
-<h1>Products</h1>
-</div>
-<div class="nav">
-{% if product_list %}
-    <table align="center">
-    <tr>
-            <td><a href="?sort=name">Name</a></td>
-            <td>Description</td>
-            <td><a href="?sort=price">Price</a></td>
-            <td><a href="?sort=rate">Likes</a></td>
-    </tr>
-    {% for p in product_list %}
-
-        <tr>
-            <td><a href="{% url 'product:detail' p.slug %}">{{ p.name }}</a></td>
-            <td>{{p.description}}</td>
-            <td>{{ p.price }}$</td>
-            <td>{{ p.rate }}</td>
-        </tr>
-    {% endfor %}
-    </table>
-{% else %}
-    <p>No Products</p>
-{% endif %}
-</div>
-<div id="wrap">
-    <div id="main" class="clearfix">
-
+                    <tr>
+                        <td data-search="{{ p.name }}"><a href="{% url 'product:detail' p.slug %}">{{ p.name }}</a></td>
+                        <td>{{ p.description }}</td>
+                        <td>{{ p.price }}$</td>
+                        <td>{{ p.rate }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No Products</p>
+        {% endif %}
     </div>
-</div>
-<div id="footer">
-Copyright © Krop
-</div>
-</body>
+    <script>
+        $(document).ready(function () {
+            $('#example').DataTable();
+        });
+    </script>
+{% endblock %}

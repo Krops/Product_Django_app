@@ -36,7 +36,8 @@ def my_view(request):
                 return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         else:
             raise forms.ValidationError("Sorry, that login was invalid. Please try again.")
-            # Return a 'disabled account' error message
+            # Return a '        #return ('detail',(),{'slug':str(self.slug)})
+        #print(reverse('detail', args=[str(self.slug)]))disabled account' error message
     else:
         raise forms.ValidationError("Sorry, that login was invalid. Please try again.")
         # Return an 'invalid login' error message.
@@ -148,8 +149,8 @@ headers = {'name':'asc',
          'rate':'asc',}
 def table_view(request):
     sort = request.GET.get('sort')
+    print('lil')
     products = Product.objects.all()
-    print('hello')
     if sort is not None:
         products = products.order_by(sort)
 
@@ -158,5 +159,6 @@ def table_view(request):
             headers[sort] = "asc"
         else:
             headers[sort] = "des"
+            products.order_by(sort)
 
     return HttpResponseRedirect(reverse('product',{'product_list':products}))

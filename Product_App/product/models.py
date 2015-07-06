@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+import datetime
+from django.core.urlresolvers import reverse
 
 # Create your models here.
 class Product(models.Model):
@@ -10,11 +13,15 @@ class Product(models.Model):
     rate = models.IntegerField(default=0)
     created_at = models.DateTimeField('date created')
     modified_at = models.DateTimeField('date modified')
+    def was_published_recently(self):
+        return self.created_at >= timezone.now() - datetime.timedelta(days=1)
+    was_published_recently.admin_order_field = 'created_at'
+    was_published_recently.boolean = True
+    was_published_recently.short_description = 'Published recently?'
     def __str__(self):
         return self.name
-    @models.permalink
     def get_absolute_url(self):
-        return 'products:product', (self.slug,)
+        return reverse('product:detail', args=[str(self.slug)])
 
 class Post(models.Model):
     title = models.CharField(max_length=60)

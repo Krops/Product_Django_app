@@ -1,152 +1,77 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        .comment {
-            border: 2px solid gray;
-            padding: 5px;
-        }
-
-        .header {
-            background-color: black;
-            color: white;
-            text-align: center;
-            padding: 5px;
-        }
-
-        .nav {
-            line-height: 30px;
-            background-color: #eeeeee;
-            height: 300px;
-            width: 200px;
-            float: left;
-            padding: 5px;
-        }
-
-        .detail {
-            float: left;
-            padding: 10px;
-            width: 700px;
-        }
-
-        #footer {
-            background-color: black;
-            color: white;
-            clear: both;
-            text-align: center;
-            padding: 5px;
-        }
-
-        .log {
-
-            background-color: black;
-            color: white;
-            width: 200px;
-            float: left;
-        }
-    </style>
-</head>
-<body>
-<div class="log">
-    {% if user.username %}
-        <form action="{% url 'product:logout_view' %}" method="POST">
-            {% csrf_token %}
-            <input type="submit" value="Logout" name="logout">
-            <label for="logout" text-align='left' float='left'>
-                <small>Login as: {{ user.username }}</small>
-            </label><br>
-        </form></p>
-    {% else %}
-        <form action="{% url 'django.contrib.auth.views.login' %}" method="POST">
-            {% csrf_token %}
-            <input type="submit" value="Login" name="login">
-            <label for="login" text-align='left' float='left'>
-                <small>Login as: Anon</small>
-            </label><br>
-        </form></p>
-    {% endif %}
-</div>
-<div class="header">
-    <h1>Products</h1>
-</div>
-<div class="nav">
-    {% if product_list %}
-        {% for p in product_list %}
-            <a href="{% url 'product:detail' p.slug %}">{{ p.name }}</a><br>
-        {% endfor %}
-    {% else %}
-        <p>No Products</p>
-    {% endif %}
-
-</div>
-<div class="detail">
-    <h1>{{ product.name }}</h1>
-
-    <h2>{{ product.price }}$</h2>
-
-    <p>{{ product.description }}</p>
-
-    <p>
-        <small>Product added: {{ product.created_at }}</small>
-    <form action="{% url 'product:vote' product.slug %}" method="POST">
-        {% csrf_token %}
-        <input type="submit" value="Vote" name="vote">
-        <label for="vote">{{ product.rate }}</label><br>
-    </form>
-    </p>
-    <hr>
-{% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+{% extends "base.html" %}
+{% block content %}
+    <div class="nav">
+        {% if product_list %}
+            {% for p in product_list %}
+                <a href="{% url 'product:detail' p.slug %}">{{ p.name }}</a><br>
             {% endfor %}
-        </ul>
-    {% endif %}
-    <p>Comments:</p>
-    <ul>{% for comment in comments reversed %}
-        <div class="comment">
-            <div class="time">
-                <small> Comment: <b>{{ comment.author }}</b> | {{ comment.created }}</small>
-            </div>
-            <hr>
-            <div class="body"><i>{{ comment.body|linebreaks }}</i></div>
-        </div>
-        <br>
-    {% endfor %}
-    </ul>
-    {% if more_comments.count > 0 %}
-        <div id="spoiler" style="display:none">
-            <ul>{% for comment in more_comments reversed %}
-                <div class="comment">
-                    <div class="time">
-                        <small> Comment: <b>{{ comment.author }}</b> | {{ comment.created }}</small>
-                    </div>
-                    <hr>
-                    <div class="body"><i>{{ comment.body|linebreaks }}</i></div>
-                </div>
-                <br>
-            {% endfor %}
+        {% else %}
+            <p>No Products</p>
+        {% endif %}
+
+    </div>
+    <div class="detail">
+        <h1>{{ product.name }}</h1>
+
+        <h2>{{ product.price }}$</h2>
+
+        <p>{{ product.description }}</p>
+
+        <p>
+            <small>Product added: {{ product.created_at }}</small>
+        <form action="{% url 'product:vote' product.slug %}" method="POST">
+            {% csrf_token %}
+            <input type="submit" value="Vote" name="vote">
+            <label for="vote">{{ product.rate }}</label><br>
+        </form>
+        </p>
+        <hr>
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
             </ul>
-        </div>
-        <button title="Click to show/hide content" type="button"
-                onclick="if(document.getElementById('spoiler') .style.display=='none') {document.getElementById('spoiler') .style.display=''}else{document.getElementById('spoiler') .style.display='none'}">
-            Show comments
-        </button>
-    {% endif %}
+        {% endif %}
+        <p>Comments:</p>
+        <ul>{% for comment in comments reversed %}
+            <div class="comment">
+                <div class="time">
+                    <small> Comment: <b>{{ comment.author }}</b> | {{ comment.created }}</small>
+                </div>
+                <hr>
+                <div class="body"><i>{{ comment.body|linebreaks }}</i></div>
+            </div>
+            <br>
+        {% endfor %}
+        </ul>
+        {% if more_comments.count > 0 %}
+            <div id="spoiler" style="display:none">
+                <ul>{% for comment in more_comments reversed %}
+                    <div class="comment">
+                        <div class="time">
+                            <small> Comment: <b>{{ comment.author }}</b> | {{ comment.created }}</small>
+                        </div>
+                        <hr>
+                        <div class="body"><i>{{ comment.body|linebreaks }}</i></div>
+                    </div>
+                    <br>
+                {% endfor %}
+                </ul>
+            </div>
+            <button title="Click to show/hide content" type="button"
+                    onclick="if(document.getElementById('spoiler') .style.display=='none') {document.getElementById('spoiler') .style.display=''}else{document.getElementById('spoiler') .style.display='none'}">
+                Show comments
+            </button>
+        {% endif %}
 
-    <div id="addc">Add a comment</div>
-    <form action="{% url 'product:add_comment' product.slug %}" method="POST">{% csrf_token %}
-        <div id="cform">
-            <!--<p><textarea name="body" value="{{ form.body}}" height="300"></p>-->
-            <textarea rows="5" cols="45" name="body"></textarea>
-        </div>
-        <div id="submit"><input type="submit" value="Submit"></div>
-    </form>
-</div>
-
-<div id="footer">
-    Copyright © Krop
-</div>
-
-</body>
-</html>
+        <div id="addc">Add a comment</div>
+        <form action="{% url 'product:add_comment' product.slug %}" method="POST">{% csrf_token %}
+            <div id="cform">
+                <!--<p><textarea name="body" value="{{ form.body}}" height="300"></p>-->
+                <textarea rows="5" cols="45" name="body"></textarea>
+            </div>
+            <div id="submit"><input type="submit" value="Submit"></div>
+        </form>
+    </div>
+{% endblock %}
