@@ -29,7 +29,14 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
+    'django.core.context_processors.static',
+    'django.core.context_processors.request', # this one
+)
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -108,7 +115,7 @@ MEDIA_ROOT = ''
 MEDIA_URL = ''
 STATIC_ROOT = ''
 STATIC_URL = '/static/'
-LOGIN_REDIRECT_URL = '/products/'
+#LOGIN_REDIRECT_URL = 'HTTP_REFERER'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
     '/var/www/static/',

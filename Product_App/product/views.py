@@ -20,10 +20,9 @@ from django.contrib.auth import logout
 
 def logout_view(request):
     logout(request)
-    #return HttpResponseRedirect(reverse('product:list'))
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-def my_view(request):
+def login_view(request):
     messages.add_message(request, 50, 'A serious error occurred.')
     username = request.POST['username']
     password = request.POST['password']
@@ -68,16 +67,20 @@ def products(request):
 def detail(request,slug):
     product_list = Product.objects.order_by('created_at')[:5]
     product = get_object_or_404(Product,slug=slug)
-    ldc = str(product.post_set.last().created)[:10].split("-")
-    ldc = [int(i) for i in ldc]
-    print(ldc)
-    comments = product.post_set.filter(created__year=ldc[0],created__month=ldc[1],created__day=ldc[2])
-    more_comments = product.post_set.exclude(created__year=ldc[0],created__month=ldc[1],created__day=ldc[2])
-    more_comments.order_by('created_at')
+    try:
+        ldc = str(product.post_set.last().created)[:10].split("-")
+        ldc = [int(i) for i in ldc]
+        comments = product.post_set.filter(created__year=ldc[0],created__month=ldc[1],created__day=ldc[2])
+        more_comments = product.post_set.exclude(created__year=ldc[0],created__month=ldc[1],created__day=ldc[2])
+        more_comments.order_by('created_at')
     #print(comments,comments2)
-    context = {'product_list':product_list,'product':product,'comments':comments,'more_comments':more_comments}
-    context.update(csrf(request))
-    return render(request, 'product/detail.html', context)
+        context = {'product_list':product_list,'product':product,'comments':comments,'more_comments':more_comments}
+        context.update(csrf(request))
+        return render(request, 'product/detail.html', context)
+    except:
+        context = {'product_list':product_list,'product':product}
+        context.update(csrf(request))
+        return render(request, 'product/detail.html', context)
 
 def add_comment(request, slug):
     product_id = Product.objects.get(slug=slug).pk
@@ -85,9 +88,13 @@ def add_comment(request, slug):
         author_id=request.user.id
     else:
         author_id=1
-    comment = Post(title="goog",body=request.POST['body'],product_id=product_id,author_id=author_id)
-    comment.save()
-    messages.add_message(request, messages.SUCCESS, 'Comment added.',fail_silently=True)
+    body=request.POST['body']
+    if len(body)>4:
+        comment = Post(title="goog",body=request.POST['body'],product_id=product_id,author_id=author_id)
+        comment.save()
+        messages.add_message(request, messages.SUCCESS, 'Comment added.',fail_silently=True)
+    else:
+        messages.add_message(request, messages.ERROR, 'Comment too small.',fail_silently=True)
     return HttpResponseRedirect(reverse('product:detail', args=(slug,)))
 def show_more_comments(request,slug):
     product_list = Product.objects.order_by('created_at')[:5]
@@ -119,7 +126,7 @@ def vote(request, slug):
                 p.save()
                 messages.add_message(request, messages.SUCCESS, 'Voted',fail_silently=True)
             elif Vote.objects.filter(author_id=request.user.id,product_id=product_id).count()==0:
-                voted = Vote(rate=True,slug=slug,author_id=request.user.id)
+                voted = Vote(rate=True,product_id=product_id,author_id=request.user.id)
                 voted.save()
                 p.rate += 1
                 p.save()

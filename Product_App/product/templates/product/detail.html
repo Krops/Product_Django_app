@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}{{ product.name }}{% endblock %}
 {% block content %}
     <div class="nav">
         {% if product_list %}
@@ -33,38 +34,39 @@
                 {% endfor %}
             </ul>
         {% endif %}
-        <p>Comments:</p>
-        <ul>{% for comment in comments reversed %}
-            <div class="comment">
-                <div class="time">
-                    <small> Comment: <b>{{ comment.author }}</b> | {{ comment.created }}</small>
-                </div>
-                <hr>
-                <div class="body"><i>{{ comment.body|linebreaks }}</i></div>
-            </div>
-            <br>
-        {% endfor %}
-        </ul>
-        {% if more_comments.count > 0 %}
-            <div id="spoiler" style="display:none">
-                <ul>{% for comment in more_comments reversed %}
-                    <div class="comment">
-                        <div class="time">
-                            <small> Comment: <b>{{ comment.author }}</b> | {{ comment.created }}</small>
-                        </div>
-                        <hr>
-                        <div class="body"><i>{{ comment.body|linebreaks }}</i></div>
+        {% if comments %}
+            <p>Comments:</p>
+            <ul>{% for comment in comments reversed %}
+                <div class="comment">
+                    <div class="time">
+                        <small> Comment: <b>{{ comment.author }}</b> | {{ comment.created }}</small>
                     </div>
-                    <br>
-                {% endfor %}
-                </ul>
-            </div>
-            <button title="Click to show/hide content" type="button"
-                    onclick="if(document.getElementById('spoiler') .style.display=='none') {document.getElementById('spoiler') .style.display=''}else{document.getElementById('spoiler') .style.display='none'}">
-                Show comments
-            </button>
+                    <hr>
+                    <div class="body"><i>{{ comment.body|linebreaks }}</i></div>
+                </div>
+                <br>
+            {% endfor %}
+            </ul>
+            {% if more_comments.count > 0 %}
+                <div id="spoiler" style="display:none">
+                    <ul>{% for comment in more_comments reversed %}
+                        <div class="comment">
+                            <div class="time">
+                                <small> Comment: <b>{{ comment.author }}</b> | {{ comment.created }}</small>
+                            </div>
+                            <hr>
+                            <div class="body"><i>{{ comment.body|linebreaks }}</i></div>
+                        </div>
+                        <br>
+                    {% endfor %}
+                    </ul>
+                </div>
+                <button title="Click to show/hide content" type="button"
+                        onclick="if(document.getElementById('spoiler') .style.display=='none') {document.getElementById('spoiler') .style.display=''}else{document.getElementById('spoiler') .style.display='none'}">
+                    Show comments
+                </button>
+            {% endif %}
         {% endif %}
-
         <div id="addc">Add a comment</div>
         <form action="{% url 'product:add_comment' product.slug %}" method="POST">{% csrf_token %}
             <div id="cform">

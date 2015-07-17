@@ -3,10 +3,15 @@ from .models import Product
 # Register your models here.]
 class PostAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None,               {'fields': ['name']}),
-        ('Date information', {'fields': ['created_at'], 'classes': ['collapse']}),
+        ('Name',               {'fields': ['name']}),
+        ('Slug',               {'fields': ['slug']}),
+        ('Description',               {'fields': ['description']}),
+        ('Price',               {'fields': ['price']}),
+       # ('Date information', {'fields': ['created_at'], 'classes': ['collapse']}),
+       # ('Date modified', {'fields': ['modified_at'], 'classes': ['collapse']}),
     ]
-    list_display = ('name', 'created_at','was_published_recently')
+    readonly_fields = ['created_at']
+    list_display = ('name', 'created_at','modified_at','was_published_recently')
     list_filter = ['created_at']
     search_fields = ["name"]
 

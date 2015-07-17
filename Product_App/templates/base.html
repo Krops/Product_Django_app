@@ -13,7 +13,7 @@
 <div class="page-wrapper">
     <div class="log">
         {% if user.username %}
-            <form action="{% url 'product:logout_view' %}" method="POST">
+            <form action="{% url 'django.contrib.auth.views.logout' %}?next={{request.path}}" method="POST">
                 {% csrf_token %}
                 <input type="submit" value="Logout" name="logout">
                 <label for="logout" text-align='left' float='left'>
@@ -21,7 +21,7 @@
                 </label><br>
             </form></p>
         {% else %}
-            <form action="{% url 'django.contrib.auth.views.login' %}" method="POST">
+            <form action="{% url 'django.contrib.auth.views.login' %}?next={{request.path}}" method="POST">
                 {% csrf_token %}
                 <input type="submit" value="Login" name="login">
                 <label for="login" text-align='left' float='left'>
@@ -31,7 +31,7 @@
         {% endif %}
     </div>
     <div class="header">
-        <h1>Products</h1>
+        <h1><a href="{% url 'product:products' %}"> Products</a></h1>
     </div>
     {% block content %}{% endblock %}
     <div class="page-buffer"></div>

@@ -11,10 +11,12 @@ class Product(models.Model):
     description = models.TextField()
     price = models.FloatField(default=0.0)
     rate = models.IntegerField(default=0)
-    created_at = models.DateTimeField('date created')
-    modified_at = models.DateTimeField('date modified')
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
     def was_published_recently(self):
-        return self.created_at >= timezone.now() - datetime.timedelta(days=1)
+        now = timezone.now()
+        return now - datetime.timedelta(days=1) <= self.created_at <= now
+
     was_published_recently.admin_order_field = 'created_at'
     was_published_recently.boolean = True
     was_published_recently.short_description = 'Published recently?'
