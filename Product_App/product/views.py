@@ -1,8 +1,10 @@
 from django.shortcuts import get_object_or_404, render
+from django.template import RequestContext
 from .models import Product, Post, Vote
 from django.views import generic
 from django import forms
 from django.db import connection
+from product.forms import CommentForm
 import sys
 from datetime import datetime
 
@@ -67,6 +69,14 @@ def products(request):
 def detail(request,slug):
     product_list = Product.objects.order_by('created_at')[:5]
     product = get_object_or_404(Product,slug=slug)
+    formset = CommentForm(request.POST or None)
+    if formset.is_valid():
+        comment = formset.save(commit=False)
+        comment.product = product
+        comment.author = request.user
+        comment.save()
+        return redirect(request.path)
+
     try:
         ldc = str(product.post_set.last().created)[:10].split("-")
         ldc = [int(i) for i in ldc]
@@ -74,41 +84,14 @@ def detail(request,slug):
         more_comments = product.post_set.exclude(created__year=ldc[0],created__month=ldc[1],created__day=ldc[2])
         more_comments.order_by('created_at')
     #print(comments,comments2)
-        context = {'product_list':product_list,'product':product,'comments':comments,'more_comments':more_comments}
+        context = {'product_list':product_list,'product':product,'comments':comments,'more_comments':more_comments,'formset': formset}
         context.update(csrf(request))
         return render(request, 'product/detail.html', context)
     except:
-        context = {'product_list':product_list,'product':product}
+        context = {'product_list':product_list,'product':product,'formset': formset}
         context.update(csrf(request))
         return render(request, 'product/detail.html', context)
 
-def add_comment(request, slug):
-    product_id = Product.objects.get(slug=slug).pk
-    if request.user.id:
-        author_id=request.user.id
-    else:
-        author_id=1
-    body=request.POST['body']
-    if len(body)>4:
-        comment = Post(title="goog",body=request.POST['body'],product_id=product_id,author_id=author_id)
-        comment.save()
-        messages.add_message(request, messages.SUCCESS, 'Comment added.',fail_silently=True)
-    else:
-        messages.add_message(request, messages.ERROR, 'Comment too small.',fail_silently=True)
-    return HttpResponseRedirect(reverse('product:detail', args=(slug,)))
-def show_more_comments(request,slug):
-    product_list = Product.objects.order_by('created_at')[:5]
-    product = get_object_or_404(Product,slug=slug)
-    ldc = str(product.post_set.last().created)[:10].split("-")
-    ldc = [int(i) for i in ldc]
-    print(ldc)
-    comments = product.post_set.filter(created__year=ldc[0],created__month=ldc[1],created__day=ldc[2])
-    if comments.count() < product.post_set.all().count():
-        comments = comments + product.post_set.all()[:5]
-    print(comments)
-    context = {'product_list':product_list,'product':product,'comments':comments}
-    context.update(csrf(request))
-    return render(request, 'product/detail.html', context)
 
 def vote(request, slug):
     p = get_object_or_404(Product, slug=slug)

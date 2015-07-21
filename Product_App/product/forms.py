@@ -1,19 +1,13 @@
 __author__ = 'krop'
-from django import forms
+from django.forms import ModelForm, Textarea, CharField
+
+
 
 from .models import Post
 
-class CommentForm(forms.ModelForm):
+class CommentForm(ModelForm):
+    title = CharField(max_length=30,min_length=3, required=True)
+    body = CharField(max_length=300,min_length=5, required=True,widget = Textarea(attrs={'cols': 24, 'rows': 5}),label='Enter the message')
     class Meta:
         model = Post
-        fields = ('title', 'body')
-
-    def __init__(self, *args, **kwargs):
-        self.entry = kwargs.pop('entry')   # the blog entry instance
-        super().__init__(*args, **kwargs)
-
-    def save(self):
-        comment = super().save(commit=False)
-        comment.entry = self.entry
-        comment.save()
-        return comment
+        fields = ['title', 'body']
